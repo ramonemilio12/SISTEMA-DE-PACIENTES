@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using SistemaPacientes.Api.Middleware;
 using SistemaPacientes.Application;
 using SistemaPacientes.Infrastructure;
@@ -7,7 +8,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "API Sistema de Pacientes",
+        Version = "v1",
+        Description = "API REST con arquitectura N-Capas (Domain, Infrastructure, Application y Api) "
+                    + "que expone el CRUD del Sistema de Pacientes."
+    });
+});
 
 var connectionString = builder.Configuration.GetConnectionString("SistemaPacientes")
     ?? throw new InvalidOperationException("No se configuró la cadena de conexión 'SistemaPacientes'.");
@@ -43,5 +54,8 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors(BlazorPolicy);
 app.MapControllers();
+
+// Endpoint de salud para comprobar que el API está en ejecución.
+app.MapHealthChecks("/health");
 
 app.Run();
