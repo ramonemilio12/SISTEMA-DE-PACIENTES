@@ -131,6 +131,10 @@ dotnet run --project SistemaPacientes.Api --launch-profile http
 Se abrirá **Swagger** en `http://localhost:5100/swagger`. En el primer arranque se crea
 la base de datos `SistemaPacientesDb` en LocalDB y se siembran los datos.
 
+Además, el API expone un **endpoint de salud** en `GET /health` para comprobar que está en ejecución.
+En [SistemaPacientes.Api.http](SistemaPacientes.Api/SistemaPacientes.Api.http) hay ejemplos listos
+para probar el CRUD desde Visual Studio o VS Code (extensión REST Client).
+
 ### 2) Blazor WebAssembly (`SistemaPacientes.Blazor`) — http://localhost:5200
 
 En otra terminal:
@@ -145,9 +149,20 @@ Abre `http://localhost:5200` en el navegador. El front consume el API en `http:/
 
 > Nota: si cambias el puerto del API, actualiza `apiBaseUrl` en `SistemaPacientes.Blazor/Program.cs`.
 
+## Herramientas y configuración
+
+| Archivo | Propósito |
+|---------|-----------|
+| `Directory.Build.props` | Propiedades comunes (`TargetFramework`, `Nullable`, `ImplicitUsings`, `LangVersion`) aplicadas a todos los proyectos. |
+| `global.json` | Fija la versión del SDK de .NET 8 (`rollForward: latestFeature`). |
+| `.editorconfig` | Reglas de estilo de C# y formato por tipo de archivo. |
+| `.gitattributes` | Normaliza los finales de línea y trata los binarios correctamente. |
+| `SistemaPacientes.Api.http` | Ejemplos de peticiones HTTP del CRUD. |
+
 ## Endpoints del API
 
 Cada recurso expone el CRUD completo: `GET` (listado), `GET/{id}`, `POST`, `PUT/{id}`, `DELETE/{id}`.
+Adicionalmente, `GET /health` devuelve el estado del API.
 
 | Recurso | Ruta base |
 |---------|-----------|
