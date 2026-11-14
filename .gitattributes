@@ -1,0 +1,26 @@
+# Normalización de finales de línea y tipos de archivo
+* text=auto
+
+# Código fuente
+*.cs           text diff=csharp
+*.razor        text
+*.razor.css    text
+*.csproj       text
+*.props        text
+*.targets      text
+*.sln          text eol=crlf
+*.json         text
+*.http         text
+*.md           text
+*.yml          text
+*.yaml         text
+
+# Recursos binarios
+*.png          binary
+*.ico          binary
+*.jpg          binary
+*.jpeg         binary
+*.gif          binary
+*.dll          binary
+*.wasm         binary
+*.dat          binary
