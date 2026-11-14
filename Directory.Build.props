@@ -1,0 +1,18 @@
+<Project>
+
+  <!--
+    Propiedades comunes a TODOS los proyectos de la solución.
+    Se aplican automáticamente por estar en la carpeta raíz (Directory.Build.props),
+    evitando repetir la misma configuración en cada .csproj.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NeutralLanguage>es</NeutralLanguage>
+  </PropertyGroup>
+
+</Project>

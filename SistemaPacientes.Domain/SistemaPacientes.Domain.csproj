@@ -1,9 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+  <!-- Las propiedades comunes (TargetFramework, Nullable, ImplicitUsings) se
+       definen en Directory.Build.props de la carpeta raíz. -->
 
 </Project>
