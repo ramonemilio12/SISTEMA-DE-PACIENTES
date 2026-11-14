@@ -1,6 +1,49 @@
-@SistemaPacientes.Api_HostAddress = http://localhost:5261
+@host = http://localhost:5100
 
-GET {{SistemaPacientes.Api_HostAddress}}/weatherforecast/
+### Salud del API
+GET {{host}}/health
+Accept: text/plain
+
+### Especialidades - listar
+GET {{host}}/api/especialidades
 Accept: application/json
 
-###
+### Especialidades - crear
+POST {{host}}/api/especialidades
+Content-Type: application/json
+
+{
+  "codigo": "ESP-010",
+  "nombre": "Dermatología",
+  "descripcion": "Atención de la piel y sus enfermedades"
+}
+
+### Pacientes - listar
+GET {{host}}/api/pacientes
+Accept: application/json
+
+### Pacientes - crear
+POST {{host}}/api/pacientes
+Content-Type: application/json
+
+{
+  "numeroExpediente": "EXP-2026-001",
+  "nombre": "Juan",
+  "apellido": "Pérez",
+  "documento": "001-1234567-8",
+  "fechaNacimiento": "1990-05-14T00:00:00",
+  "sexo": "Masculino",
+  "telefono": "809-555-1234",
+  "correo": "juan.perez@example.com",
+  "direccion": "Av. Principal #10",
+  "tipoSangre": "O+",
+  "seguroMedicoId": null
+}
+
+### Médicos - listar
+GET {{host}}/api/medicos
+Accept: application/json
+
+### Citas - listar
+GET {{host}}/api/citas
+Accept: application/json
