@@ -1,0 +1,36 @@
+@page "/especialidades"
+
+<PageTitle>Especialidades</PageTitle>
+
+<CrudManager TItem="EspecialidadModel"
+             Title="Especialidades"
+             ApiPath="api/especialidades"
+             IdSelector="@(e => e.Id)"
+             DisplayName="@(e => e.Nombre)"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Código</label>
+                <input class="form-control" @bind="m.Codigo" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" @bind="m.Nombre" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Descripción</label>
+                <input class="form-control" @bind="m.Descripcion" />
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    private readonly List<ColumnDef<EspecialidadModel>> _columns = new()
+    {
+        new("Código", e => e.Codigo),
+        new("Nombre", e => e.Nombre),
+        new("Descripción", e => e.Descripcion)
+    };
+}

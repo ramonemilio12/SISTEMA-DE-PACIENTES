@@ -1,0 +1,94 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Sistema de Pacientes</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="especialidades">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Especialidades
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="seguros-medicos">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Seguros médicos
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="habitaciones">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Habitaciones
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="medicamentos">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Medicamentos
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="pacientes">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Pacientes
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="medicos">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Médicos
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="citas">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Citas
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="consultas">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Consultas
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="diagnosticos">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Diagnósticos
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="tratamientos">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tratamientos
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="recetas">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Recetas
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="receta-detalles">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Receta detalles
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="hospitalizaciones">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Hospitalizaciones
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

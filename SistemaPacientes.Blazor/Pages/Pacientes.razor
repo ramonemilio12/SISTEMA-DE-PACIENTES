@@ -1,0 +1,95 @@
+@page "/pacientes"
+
+<PageTitle>Pacientes</PageTitle>
+
+<CrudManager TItem="PacienteModel"
+             Title="Pacientes"
+             ApiPath="api/pacientes"
+             IdSelector="@(p => p.Id)"
+             DisplayName="@(p => $"{p.Nombre} {p.Apellido}")"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Número de Expediente</label>
+                <input class="form-control" @bind="m.NumeroExpediente" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" @bind="m.Nombre" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Apellido</label>
+                <input class="form-control" @bind="m.Apellido" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Documento</label>
+                <input class="form-control" @bind="m.Documento" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fecha de Nacimiento</label>
+                <input type="date" class="form-control" @bind="m.FechaNacimiento" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Sexo</label>
+                <input class="form-control" @bind="m.Sexo" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Teléfono</label>
+                <input class="form-control" @bind="m.Telefono" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Correo</label>
+                <input class="form-control" @bind="m.Correo" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Dirección</label>
+                <input class="form-control" @bind="m.Direccion" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Tipo de Sangre</label>
+                <input class="form-control" @bind="m.TipoSangre" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Seguro Médico</label>
+                <select class="form-select" @bind="m.SeguroMedicoId">
+                    <option value="">-- Ninguno --</option>
+                    @foreach (var seguro in _seguros)
+                    {
+                        <option value="@seguro.Id">@seguro.Nombre</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    [Inject] private ApiService Api { get; set; } = default!;
+
+    private List<SeguroMedicoModel> _seguros = new();
+
+    private readonly List<ColumnDef<PacienteModel>> _columns;
+
+    public Pacientes()
+    {
+        _columns = new()
+        {
+            new("Expediente", p => p.NumeroExpediente),
+            new("Nombre", p => $"{p.Nombre} {p.Apellido}"),
+            new("Documento", p => p.Documento),
+            new("Teléfono", p => p.Telefono),
+            new("Sexo", p => p.Sexo),
+            new("Tipo sangre", p => p.TipoSangre),
+            new("Seguro", p => SeguroNombre(p.SeguroMedicoId))
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _seguros = await Api.GetAllAsync<SeguroMedicoModel>("api/seguros-medicos");
+    }
+
+    private string SeguroNombre(Guid? id)
+        => _seguros.FirstOrDefault(s => s.Id == id) is { } s ? s.Nombre : "-";
+}

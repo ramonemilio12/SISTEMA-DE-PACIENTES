@@ -1,0 +1,67 @@
+@page "/diagnosticos"
+
+<PageTitle>Diagnósticos</PageTitle>
+
+<CrudManager TItem="DiagnosticoModel"
+             Title="Diagnósticos"
+             ApiPath="api/diagnosticos"
+             IdSelector="@(d => d.Id)"
+             DisplayName="@(d => d.Descripcion)"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Consulta</label>
+                <select class="form-select" @bind="m.ConsultaId">
+                    @foreach (var consulta in _consultas)
+                    {
+                        <option value="@consulta.Id">@consulta.FechaHora.ToString("yyyy-MM-dd HH:mm")</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Código</label>
+                <input class="form-control" @bind="m.Codigo" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Descripción</label>
+                <input class="form-control" @bind="m.Descripcion" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Gravedad</label>
+                <select class="form-select" @bind="m.Gravedad">
+                    <option value="Leve">Leve</option>
+                    <option value="Moderada">Moderada</option>
+                    <option value="Grave">Grave</option>
+                </select>
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    [Inject] private ApiService Api { get; set; } = default!;
+
+    private List<ConsultaModel> _consultas = new();
+
+    private readonly List<ColumnDef<DiagnosticoModel>> _columns;
+
+    public Diagnosticos()
+    {
+        _columns = new()
+        {
+            new("Código", d => d.Codigo),
+            new("Descripción", d => d.Descripcion),
+            new("Gravedad", d => d.Gravedad),
+            new("Consulta", d => ConsultaFecha(d.ConsultaId))
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _consultas = await Api.GetAllAsync<ConsultaModel>("api/consultas");
+    }
+
+    private string ConsultaFecha(Guid id)
+        => _consultas.FirstOrDefault(c => c.Id == id) is { } c ? c.FechaHora.ToString("yyyy-MM-dd HH:mm") : "-";
+}

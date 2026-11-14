@@ -1,0 +1,84 @@
+@page "/recetas"
+
+<PageTitle>Recetas</PageTitle>
+
+<CrudManager TItem="RecetaModel"
+             Title="Recetas"
+             ApiPath="api/recetas"
+             IdSelector="@(r => r.Id)"
+             DisplayName="@(r => $"{r.FechaEmision:yyyy-MM-dd}")"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Consulta</label>
+                <select class="form-select" @bind="m.ConsultaId">
+                    @foreach (var c in _consultas)
+                    {
+                        <option value="@c.Id">@c.FechaHora.ToString("yyyy-MM-dd")</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Médico</label>
+                <select class="form-select" @bind="m.MedicoId">
+                    @foreach (var med in _medicos)
+                    {
+                        <option value="@med.Id">@med.Nombre @med.Apellido</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Paciente</label>
+                <select class="form-select" @bind="m.PacienteId">
+                    @foreach (var p in _pacientes)
+                    {
+                        <option value="@p.Id">@p.Nombre @p.Apellido</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fecha de emisión</label>
+                <input type="date" class="form-control" @bind="m.FechaEmision" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Indicaciones</label>
+                <input class="form-control" @bind="m.Indicaciones" />
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    [Inject] private ApiService Api { get; set; } = default!;
+
+    private List<ConsultaModel> _consultas = new();
+    private List<PacienteModel> _pacientes = new();
+    private List<MedicoModel> _medicos = new();
+
+    private readonly List<ColumnDef<RecetaModel>> _columns;
+
+    public Recetas()
+    {
+        _columns = new()
+        {
+            new("Fecha", r => r.FechaEmision),
+            new("Paciente", r => PacienteNombre(r.PacienteId)),
+            new("Médico", r => MedicoNombre(r.MedicoId)),
+            new("Indicaciones", r => r.Indicaciones)
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _consultas = await Api.GetAllAsync<ConsultaModel>("api/consultas");
+        _pacientes = await Api.GetAllAsync<PacienteModel>("api/pacientes");
+        _medicos = await Api.GetAllAsync<MedicoModel>("api/medicos");
+    }
+
+    private string PacienteNombre(Guid id)
+        => _pacientes.FirstOrDefault(p => p.Id == id) is { } p ? $"{p.Nombre} {p.Apellido}" : "-";
+
+    private string MedicoNombre(Guid id)
+        => _medicos.FirstOrDefault(m => m.Id == id) is { } m ? $"{m.Nombre} {m.Apellido}" : "-";
+}

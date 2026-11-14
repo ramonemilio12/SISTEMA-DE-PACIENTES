@@ -1,0 +1,201 @@
+@typeparam TItem where TItem : class, new()
+@using System.Text.Json
+@using SistemaPacientes.Blazor.Components
+@using SistemaPacientes.Blazor.Models
+@using SistemaPacientes.Blazor.Services
+
+<div class="crud-page">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">@Title</h3>
+        <button class="btn btn-primary" @onclick="StartCreate">Nuevo</button>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(_error))
+    {
+        <div class="alert alert-danger">@_error</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(_message))
+    {
+        <div class="alert alert-success">@_message</div>
+    }
+
+    @if (_loading)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else if (Items.Count == 0)
+    {
+        <p class="text-muted">No hay registros.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-sm align-middle">
+                <thead>
+                    <tr>
+                        @foreach (var column in Columns)
+                        {
+                            <th>@column.Header</th>
+                        }
+                        <th style="width: 170px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Items)
+                    {
+                        <tr>
+                            @foreach (var column in Columns)
+                            {
+                                <td>@column.Value(item)</td>
+                            }
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => StartEdit(item)">Editar</button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(item)">Eliminar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (_showEditor && EditModel is not null)
+    {
+        <div class="card mt-3">
+            <div class="card-header">@(_isNew ? "Nuevo registro" : "Editar registro")</div>
+            <div class="card-body">
+                @EditorFields(EditModel)
+            </div>
+            <div class="card-footer">
+                <button class="btn btn-success me-2" @onclick="SaveAsync" disabled="@_saving">Guardar</button>
+                <button class="btn btn-secondary" @onclick="Cancel" disabled="@_saving">Cancelar</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string ApiPath { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public Func<TItem, Guid> IdSelector { get; set; } = default!;
+    [Parameter, EditorRequired] public Func<TItem, string> DisplayName { get; set; } = default!;
+    [Parameter] public List<ColumnDef<TItem>> Columns { get; set; } = new();
+    [Parameter] public RenderFragment<TItem> EditorFields { get; set; } = default!;
+
+    [Inject] private ApiService Api { get; set; } = default!;
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
+
+    private List<TItem> Items { get; set; } = new();
+    private TItem? EditModel { get; set; }
+    private bool _loading = true;
+    private bool _showEditor;
+    private bool _isNew;
+    private bool _saving;
+    private string? _error;
+    private string? _message;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+
+        try
+        {
+            Items = await Api.GetAllAsync<TItem>(ApiPath);
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void StartCreate()
+    {
+        EditModel = new TItem();
+        _isNew = true;
+        _showEditor = true;
+        _error = null;
+        _message = null;
+    }
+
+    private void StartEdit(TItem item)
+    {
+        EditModel = Clone(item);
+        _isNew = false;
+        _showEditor = true;
+        _error = null;
+        _message = null;
+    }
+
+    private void Cancel() => _showEditor = false;
+
+    private async Task SaveAsync()
+    {
+        if (EditModel is null)
+        {
+            return;
+        }
+
+        _saving = true;
+        _error = null;
+        _message = null;
+
+        try
+        {
+            if (_isNew)
+            {
+                await Api.CreateAsync(ApiPath, EditModel);
+                _message = "Registro creado correctamente.";
+            }
+            else
+            {
+                await Api.UpdateAsync(ApiPath, IdSelector(EditModel), EditModel);
+                _message = "Registro actualizado correctamente.";
+            }
+
+            _showEditor = false;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private async Task Delete(TItem item)
+    {
+        var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"¿Eliminar '{DisplayName(item)}'?");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        _error = null;
+        _message = null;
+
+        try
+        {
+            await Api.DeleteAsync(ApiPath, IdSelector(item));
+            _message = "Registro eliminado correctamente.";
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private static TItem Clone(TItem item)
+        => JsonSerializer.Deserialize<TItem>(JsonSerializer.Serialize(item))!;
+}

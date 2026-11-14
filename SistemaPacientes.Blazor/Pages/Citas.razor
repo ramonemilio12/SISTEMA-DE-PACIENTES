@@ -1,0 +1,82 @@
+@page "/citas"
+
+<PageTitle>Citas</PageTitle>
+
+<CrudManager TItem="CitaModel"
+             Title="Citas"
+             ApiPath="api/citas"
+             IdSelector="@(c => c.Id)"
+             DisplayName="@(c => $"{c.FechaHora:yyyy-MM-dd HH:mm}")"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Paciente</label>
+                <select class="form-select" @bind="m.PacienteId">
+                    @foreach (var paciente in _pacientes)
+                    {
+                        <option value="@paciente.Id">@paciente.Nombre @paciente.Apellido</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Médico</label>
+                <select class="form-select" @bind="m.MedicoId">
+                    @foreach (var medico in _medicos)
+                    {
+                        <option value="@medico.Id">@medico.Nombre @medico.Apellido</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fecha y hora</label>
+                <input type="datetime-local" class="form-control" @bind="m.FechaHora" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Motivo</label>
+                <input class="form-control" @bind="m.Motivo" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                <select class="form-select" @bind="m.Estado">
+                    <option value="Programada">Programada</option>
+                    <option value="Atendida">Atendida</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    [Inject] private ApiService Api { get; set; } = default!;
+
+    private List<PacienteModel> _pacientes = new();
+    private List<MedicoModel> _medicos = new();
+
+    private readonly List<ColumnDef<CitaModel>> _columns;
+
+    public Citas()
+    {
+        _columns = new()
+        {
+            new("Fecha", c => c.FechaHora),
+            new("Paciente", c => PacienteNombre(c.PacienteId)),
+            new("Médico", c => MedicoNombre(c.MedicoId)),
+            new("Motivo", c => c.Motivo),
+            new("Estado", c => c.Estado)
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pacientes = await Api.GetAllAsync<PacienteModel>("api/pacientes");
+        _medicos = await Api.GetAllAsync<MedicoModel>("api/medicos");
+    }
+
+    private string PacienteNombre(Guid id)
+        => _pacientes.FirstOrDefault(p => p.Id == id) is { } p ? $"{p.Nombre} {p.Apellido}" : "-";
+
+    private string MedicoNombre(Guid id)
+        => _medicos.FirstOrDefault(m => m.Id == id) is { } m ? $"{m.Nombre} {m.Apellido}" : "-";
+}

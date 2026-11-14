@@ -1,0 +1,50 @@
+@page "/"
+
+<PageTitle>Sistema de Pacientes</PageTitle>
+
+<h1>Sistema de Pacientes</h1>
+
+<p class="lead">
+    Cliente Blazor WebAssembly que consume la API CRUD (N-Capas) del Sistema de Pacientes.
+</p>
+
+<div class="alert alert-info">
+    Utilice el menú lateral para gestionar cada una de las entidades del sistema.
+    La API debe estar en ejecución en <strong>http://localhost:5100</strong>.
+</div>
+
+<div class="row g-3">
+    @foreach (var item in _modules)
+    {
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@item.Title</h5>
+                    <p class="card-text text-muted">@item.Description</p>
+                    <a class="btn btn-sm btn-primary" href="@item.Url">Abrir</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private sealed record Module(string Title, string Description, string Url);
+
+    private readonly List<Module> _modules = new()
+    {
+        new("Especialidades", "Catálogo de especialidades médicas.", "especialidades"),
+        new("Seguros médicos", "Aseguradoras y porcentaje de cobertura.", "seguros-medicos"),
+        new("Habitaciones", "Habitaciones hospitalarias y disponibilidad.", "habitaciones"),
+        new("Medicamentos", "Catálogo de medicamentos.", "medicamentos"),
+        new("Pacientes", "Registro de pacientes y su seguro.", "pacientes"),
+        new("Médicos", "Médicos y su especialidad.", "medicos"),
+        new("Citas", "Agenda de citas médicas.", "citas"),
+        new("Consultas", "Consultas médicas realizadas.", "consultas"),
+        new("Diagnósticos", "Diagnósticos asociados a consultas.", "diagnosticos"),
+        new("Tratamientos", "Tratamientos indicados.", "tratamientos"),
+        new("Recetas", "Recetas emitidas.", "recetas"),
+        new("Receta detalles", "Medicamentos de cada receta.", "receta-detalles"),
+        new("Hospitalizaciones", "Ingresos hospitalarios.", "hospitalizaciones")
+    };
+}

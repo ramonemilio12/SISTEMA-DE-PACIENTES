@@ -1,0 +1,78 @@
+@page "/receta-detalles"
+
+<PageTitle>Receta detalles</PageTitle>
+
+<CrudManager TItem="RecetaDetalleModel"
+             Title="Receta detalles"
+             ApiPath="api/receta-detalles"
+             IdSelector="@(d => d.Id)"
+             DisplayName="@(d => d.Dosis)"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Receta</label>
+                <select class="form-select" @bind="m.RecetaId">
+                    @foreach (var r in _recetas)
+                    {
+                        <option value="@r.Id">@r.FechaEmision.ToString("yyyy-MM-dd")</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Medicamento</label>
+                <select class="form-select" @bind="m.MedicamentoId">
+                    @foreach (var med in _medicamentos)
+                    {
+                        <option value="@med.Id">@med.Nombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Dosis</label>
+                <input class="form-control" @bind="m.Dosis" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Frecuencia</label>
+                <input class="form-control" @bind="m.Frecuencia" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Días</label>
+                <input type="number" class="form-control" @bind="m.DuracionDias" />
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    [Inject] private ApiService Api { get; set; } = default!;
+
+    private List<RecetaModel> _recetas = new();
+    private List<MedicamentoModel> _medicamentos = new();
+
+    private readonly List<ColumnDef<RecetaDetalleModel>> _columns;
+
+    public RecetaDetalles()
+    {
+        _columns = new()
+        {
+            new("Receta", d => RecetaFecha(d.RecetaId)),
+            new("Medicamento", d => MedicamentoNombre(d.MedicamentoId)),
+            new("Dosis", d => d.Dosis),
+            new("Frecuencia", d => d.Frecuencia),
+            new("Días", d => d.DuracionDias)
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _recetas = await Api.GetAllAsync<RecetaModel>("api/recetas");
+        _medicamentos = await Api.GetAllAsync<MedicamentoModel>("api/medicamentos");
+    }
+
+    private string RecetaFecha(Guid id)
+        => _recetas.FirstOrDefault(r => r.Id == id) is { } r ? r.FechaEmision.ToString("yyyy-MM-dd") : "-";
+
+    private string MedicamentoNombre(Guid id)
+        => _medicamentos.FirstOrDefault(m => m.Id == id) is { } m ? m.Nombre : "-";
+}

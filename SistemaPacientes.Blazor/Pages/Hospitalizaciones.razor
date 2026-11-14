@@ -1,0 +1,78 @@
+@page "/hospitalizaciones"
+
+<PageTitle>Hospitalizaciones</PageTitle>
+
+<CrudManager TItem="HospitalizacionModel"
+             Title="Hospitalizaciones"
+             ApiPath="api/hospitalizaciones"
+             IdSelector="@(h => h.Id)"
+             DisplayName="@(h => $"{h.FechaIngreso:yyyy-MM-dd}")"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Paciente</label>
+                <select class="form-select" @bind="m.PacienteId">
+                    @foreach (var p in _pacientes)
+                    {
+                        <option value="@p.Id">@p.Nombre @p.Apellido</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Habitación</label>
+                <select class="form-select" @bind="m.HabitacionId">
+                    @foreach (var h in _habitaciones)
+                    {
+                        <option value="@h.Id">@h.Numero</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fecha de ingreso</label>
+                <input type="datetime-local" class="form-control" @bind="m.FechaIngreso" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fecha de alta</label>
+                <input type="date" class="form-control" @bind="m.FechaAlta" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Motivo</label>
+                <input class="form-control" @bind="m.Motivo" />
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    [Inject] private ApiService Api { get; set; } = default!;
+
+    private List<PacienteModel> _pacientes = new();
+    private List<HabitacionModel> _habitaciones = new();
+
+    private readonly List<ColumnDef<HospitalizacionModel>> _columns;
+
+    public Hospitalizaciones()
+    {
+        _columns = new()
+        {
+            new("Paciente", h => PacienteNombre(h.PacienteId)),
+            new("Habitación", h => HabitacionNumero(h.HabitacionId)),
+            new("Ingreso", h => h.FechaIngreso),
+            new("Alta", h => h.FechaAlta),
+            new("Motivo", h => h.Motivo)
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pacientes = await Api.GetAllAsync<PacienteModel>("api/pacientes");
+        _habitaciones = await Api.GetAllAsync<HabitacionModel>("api/habitaciones");
+    }
+
+    private string PacienteNombre(Guid id)
+        => _pacientes.FirstOrDefault(p => p.Id == id) is { } p ? $"{p.Nombre} {p.Apellido}" : "-";
+
+    private string HabitacionNumero(Guid id)
+        => _habitaciones.FirstOrDefault(h => h.Id == id) is { } h ? h.Numero : "-";
+}

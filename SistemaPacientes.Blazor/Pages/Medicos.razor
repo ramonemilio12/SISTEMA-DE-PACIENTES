@@ -1,0 +1,72 @@
+@page "/medicos"
+
+<PageTitle>Médicos</PageTitle>
+
+<CrudManager TItem="MedicoModel"
+             Title="Médicos"
+             ApiPath="api/medicos"
+             IdSelector="@(m => m.Id)"
+             DisplayName="@(m => $"{m.Nombre} {m.Apellido}")"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Número de colegiado</label>
+                <input class="form-control" @bind="m.NumeroColegiado" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" @bind="m.Nombre" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Apellido</label>
+                <input class="form-control" @bind="m.Apellido" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Correo</label>
+                <input class="form-control" @bind="m.Correo" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Teléfono</label>
+                <input class="form-control" @bind="m.Telefono" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Especialidad</label>
+                <select class="form-select" @bind="m.EspecialidadId">
+                    @foreach (var especialidad in _especialidades)
+                    {
+                        <option value="@especialidad.Id">@especialidad.Nombre</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    [Inject] private ApiService Api { get; set; } = default!;
+
+    private List<EspecialidadModel> _especialidades = new();
+
+    private readonly List<ColumnDef<MedicoModel>> _columns;
+
+    public Medicos()
+    {
+        _columns = new()
+        {
+            new("Colegiado", m => m.NumeroColegiado),
+            new("Nombre completo", m => $"{m.Nombre} {m.Apellido}"),
+            new("Correo", m => m.Correo),
+            new("Teléfono", m => m.Telefono),
+            new("Especialidad", m => EspecialidadNombre(m.EspecialidadId))
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _especialidades = await Api.GetAllAsync<EspecialidadModel>("api/especialidades");
+    }
+
+    private string EspecialidadNombre(Guid id)
+        => _especialidades.FirstOrDefault(e => e.Id == id) is { } e ? e.Nombre : "-";
+}

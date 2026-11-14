@@ -1,0 +1,41 @@
+@page "/medicamentos"
+
+<PageTitle>Medicamentos</PageTitle>
+
+<CrudManager TItem="MedicamentoModel"
+             Title="Medicamentos"
+             ApiPath="api/medicamentos"
+             IdSelector="@(m => m.Id)"
+             DisplayName="@(m => m.Nombre)"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Código</label>
+                <input class="form-control" @bind="m.Codigo" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" @bind="m.Nombre" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Presentación</label>
+                <input class="form-control" @bind="m.Presentacion" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Concentración</label>
+                <input class="form-control" @bind="m.Concentracion" />
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    private readonly List<ColumnDef<MedicamentoModel>> _columns = new()
+    {
+        new("Código", m => m.Codigo),
+        new("Nombre", m => m.Nombre),
+        new("Presentación", m => m.Presentacion),
+        new("Concentración", m => m.Concentracion)
+    };
+}

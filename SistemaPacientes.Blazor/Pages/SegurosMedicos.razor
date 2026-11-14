@@ -1,0 +1,41 @@
+@page "/seguros-medicos"
+
+<PageTitle>Seguros Médicos</PageTitle>
+
+<CrudManager TItem="SeguroMedicoModel"
+             Title="Seguros Médicos"
+             ApiPath="api/seguros-medicos"
+             IdSelector="@(s => s.Id)"
+             DisplayName="@(s => s.Nombre)"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Código</label>
+                <input class="form-control" @bind="m.Codigo" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" @bind="m.Nombre" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Cobertura</label>
+                <input type="number" step="0.01" class="form-control" @bind="m.Cobertura" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Teléfono</label>
+                <input class="form-control" @bind="m.Telefono" />
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    private readonly List<ColumnDef<SeguroMedicoModel>> _columns = new()
+    {
+        new("Código", s => s.Codigo),
+        new("Nombre", s => s.Nombre),
+        new("Cobertura", s => s.Cobertura),
+        new("Teléfono", s => s.Telefono)
+    };
+}

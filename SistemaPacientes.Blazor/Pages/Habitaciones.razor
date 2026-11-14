@@ -1,0 +1,43 @@
+@page "/habitaciones"
+
+<PageTitle>Habitaciones</PageTitle>
+
+<CrudManager TItem="HabitacionModel"
+             Title="Habitaciones"
+             ApiPath="api/habitaciones"
+             IdSelector="@(h => h.Id)"
+             DisplayName="@(h => h.Numero)"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Número</label>
+                <input class="form-control" @bind="m.Numero" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Piso</label>
+                <input type="number" class="form-control" @bind="m.Piso" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Tipo</label>
+                <input class="form-control" @bind="m.Tipo" />
+            </div>
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" @bind="m.Disponible" />
+                    <label class="form-check-label">Disponible</label>
+                </div>
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    private readonly List<ColumnDef<HabitacionModel>> _columns = new()
+    {
+        new("Número", h => h.Numero),
+        new("Piso", h => h.Piso),
+        new("Tipo", h => h.Tipo),
+        new("Disponible", h => h.Disponible)
+    };
+}

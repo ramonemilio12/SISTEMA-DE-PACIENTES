@@ -1,0 +1,68 @@
+@page "/tratamientos"
+
+<PageTitle>Tratamientos</PageTitle>
+
+<CrudManager TItem="TratamientoModel"
+             Title="Tratamientos"
+             ApiPath="api/tratamientos"
+             IdSelector="@(t => t.Id)"
+             DisplayName="@(t => t.Descripcion)"
+             Columns="_columns">
+    <EditorFields Context="m">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Consulta</label>
+                <select class="form-select" @bind="m.ConsultaId">
+                    @foreach (var c in _consultas)
+                    {
+                        <option value="@c.Id">@c.FechaHora.ToString("yyyy-MM-dd")</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Descripción</label>
+                <input class="form-control" @bind="m.Descripcion" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Inicio</label>
+                <input type="date" class="form-control" @bind="m.FechaInicio" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fin</label>
+                <input type="date" class="form-control" @bind="m.FechaFin" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Indicaciones</label>
+                <input class="form-control" @bind="m.Indicaciones" />
+            </div>
+        </div>
+    </EditorFields>
+</CrudManager>
+
+@code {
+    [Inject] private ApiService Api { get; set; } = default!;
+
+    private List<ConsultaModel> _consultas = new();
+
+    private readonly List<ColumnDef<TratamientoModel>> _columns;
+
+    public Tratamientos()
+    {
+        _columns = new()
+        {
+            new("Descripción", t => t.Descripcion),
+            new("Inicio", t => t.FechaInicio),
+            new("Fin", t => t.FechaFin),
+            new("Indicaciones", t => t.Indicaciones),
+            new("Consulta", t => ConsultaFecha(t.ConsultaId))
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _consultas = await Api.GetAllAsync<ConsultaModel>("api/consultas");
+    }
+
+    private string ConsultaFecha(Guid id)
+        => _consultas.FirstOrDefault(c => c.Id == id) is { } c ? c.FechaHora.ToString("yyyy-MM-dd") : "-";
+}
